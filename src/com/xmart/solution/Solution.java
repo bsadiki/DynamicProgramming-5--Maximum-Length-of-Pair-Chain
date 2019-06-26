@@ -5,27 +5,35 @@ import java.util.Arrays;
 public class Solution {
     public static void main(String[] args) {
         int[][] values = {{4, 5}, {1, 2}, {7, 8}, {2, 3}, {6, 7}, {9, 10}, {3, 4}};
-        System.out.println(maxLengthOfPairChain(values, 7));
+        System.out.println(maxLengthOfPairChain(values));
     }
 
-    private static int maxLengthOfPairChain(int[][] values, int n) {
-        if (n == 1 || n == 0)
-            return n;
+    private static int maxLengthOfPairChain(int[][] values) {
+        if (values.length == 1 || values.length == 0)
+            return values.length;
         values = sortValues(values);
-        int maxLenght = 0;
-        for (int i = n - 2; i >= 1; i--) {
-            if (iCanChainWithN(values[n - 1], values[i])) {
-                maxLenght = 1 + maxLengthOfPairChain(values, i + 1);
-                break;
-            }
-        }
-        return Math.max(maxLenght, maxLengthOfPairChain(values, n - 1));
+        int[] maxLenghtInN = new int[values.length];
+        maxLenghtInN[0] = 1;
+        getMaxChainedWithPreviousPairs(values, maxLenghtInN);
+        return maxLenghtInN[maxLenghtInN.length - 1];
     }
 
     private static int[][] sortValues(int[][] values) {
         return Arrays.stream(values).map(val -> new Pair(val[0], val[1])).sorted()
                 .map(Pair::convert)
                 .toArray(int[][]::new);
+    }
+
+    private static void getMaxChainedWithPreviousPairs(int[][] values, int[] maxLenghtInN) {
+        for (int i = 1; i < values.length; i++) {
+            for (int j = i - 1; j > 0; j--) {
+                if (iCanChainWithN(values[i], values[j])) {
+                    maxLenghtInN[i] = 1 + maxLenghtInN[j];
+                    break;
+                }
+            }
+            maxLenghtInN[i] = Math.max(maxLenghtInN[i], maxLenghtInN[i - 1]);
+        }
     }
 
 
